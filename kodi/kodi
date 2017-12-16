@@ -1,0 +1,86 @@
+#!/usr/bin/env python
+
+"""
+thesraid@gmail.com
+"""
+
+import requests
+import urllib3
+import argparse
+import json
+
+# Disable SSL warnings
+urllib3.disable_warnings()
+
+###########################################################################################
+"""
+Get command line args from the user.
+"""
+def get_args():
+    parser = argparse.ArgumentParser(
+        description='Login Details and Controller domain')
+
+    parser.add_argument('-p', '--pause',
+                        required=False,
+                        type=int,
+                        action='store',
+                        help='Pause/Play')
+
+    parser.add_argument('-s', '--stop',
+                       required=False,
+                       type=int,
+                       action='store',
+                       help='Stop')
+
+    parser.add_argument('-c', '--channel',
+                       required=False,
+                       type=int,
+                       action='store',
+                       help='Channel Number')
+
+    args = parser.parse_args()
+
+    return args
+
+###########################################################################################
+"""
+Main module
+"""
+def main():
+
+   args = get_args()
+
+   pause=args.pause
+   stop=args.stop
+   channel=args.channel
+
+   """ Create a session - stores cookies """
+   s = requests.Session()
+
+   """ Frequently used vars, json and URLS """
+   kodi = 'http://192.168.0.6:8080/jsonrpc?'
+   headers = {'Origin': 'http://192.168.0.6:8080', 'Accept-Encoding': 'gzip, deflate', 'Accept-Language': 'en-US,en;q=0.9,ga;q=0.8,de;q=0.7', 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36', 'Content-Type': 'application/json', 'Accept': 'text/plain, */*; q=0.01', 'Referer': 'http://192.168.0.6:8080/', 'X-Requested-With': 'XMLHttpRequest', 'Connection': 'keep-alive', 'DNT': '1'}
+
+   """
+   Switch to the chose Quick Select
+   """
+   if pause:
+      print "INFO: Play Pause Toggle"
+      response = s.post(kodi + 'Player.PlayPause', headers=headers, data='[{"jsonrpc":"2.0","method":"Player.PlayPause","params":[1,"toggle"],"id":99}]', timeout=7)
+
+   if stop:
+      print "INFO: Play Pause Toggle"
+      response = s.post(kodi + 'Player.Stop', headers=headers, data='[{"jsonrpc":"2.0","method":"Player.Stop","params":[1],"id":99}]', timeout=7)
+
+   if channel:
+      print "INFO: Opening Channel", channel
+      response = s.post(kodi + 'Player.Open', headers=headers, data='[{"jsonrpc":"2.0","method":"Player.Open","params":{"item":{"channelid":' + str(channel) +'},"options":{}},"id":99}]', timeout=7)
+
+
+
+
+###########################################################################################
+
+""" Start program """
+if __name__ == "__main__":
+    main()
