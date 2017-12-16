@@ -1,0 +1,119 @@
+#!/usr/bin/env python
+
+"""
+thesraid@gmail.com
+"""
+
+import requests
+import urllib3
+import argparse
+
+# Disable SSL warnings
+urllib3.disable_warnings()
+
+###########################################################################################
+"""
+Get command line args from the user.
+"""
+def get_args():
+    parser = argparse.ArgumentParser(
+        description='Login Details and Controller domain')
+
+    parser.add_argument('-q', '--quick',
+                        required=False,
+                        type=int,
+                        #default=443,
+                        action='store',
+                        help='Quick Select Option')
+
+    parser.add_argument('-u', '--volumeup',
+                        type=int,
+                        required=False,
+                        action='store',
+                        help='Number to increase volume by')
+
+    parser.add_argument('-d', '--volumedown',
+                        type=int,
+                        required=False,
+                        action='store',
+                        help='Number to decrease volume by')
+
+    parser.add_argument('-m', '--mute',
+                        required=False,
+                        type=int,
+                        action='store',
+                        help='Mute the volume')
+
+    args = parser.parse_args()
+
+    return args
+
+###########################################################################################
+"""
+Main module
+"""
+def main():
+
+   args = get_args()
+
+   quick=args.quick
+   up=args.volumeup
+   down=args.volumedown
+   mute=args.mute
+
+   """ Create a session - stores cookies """
+   s = requests.Session()
+
+   """ Frequently used vars, json and URLS """
+   denon = 'http://192.168.0.9/MainZone/index.put.asp'
+   headers = {'Cookie': 'ZoneName=MAIN%20ZONE', 'Origin': 'http://192.168.0.9', 'Accept-Encoding': 'gzip, deflate', 'Accept-Language': 'en-US,en;q=0.9,ga;q=0.8,de;q=0.7', 'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36', 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': '*/*', 'Referer': 'http://192.168.0.9/MainZone/index.html', 'X-Requested-With': 'XMLHttpRequest', 'Connection': 'keep-alive', 'DNT': '1'}
+
+   """
+   Switch to the chose Quick Select
+   """
+   if quick:
+      print "INFO: Switching to Quick Select"
+      try:
+         response = s.post(denon, headers=headers, data='cmd0=PutUserMode%2FQuick' + str(quick) + '&cmd1=aspMainZone_WebUpdateStatus%2F', timeout=7)
+      except:
+         print "Error"
+         exit()
+   
+   """ Increase the volume """
+   if up:
+      up = up * 2
+      print "INFO: Increasing volume"
+      for i in range (up):
+         try:
+            #print "UP"
+            response = s.post(denon, headers=headers, data='cmd0=PutMasterVolumeBtn%2F%3E&cmd1=aspMainZone_WebUpdateStatus%2F', timeout=3)   
+         except:                                                      
+            print "Error"                            
+            exit()                                                    
+
+   """ Decrease the volume """
+   if down:
+     down = down * 2
+     print "INFO: Decreasing volume"
+     for i in range (down):
+        try:
+           #print "DOWN"
+           response = s.post(denon, headers=headers, data='cmd0=PutMasterVolumeBtn%2F%3C&cmd1=aspMainZone_WebUpdateStatus%2F', timeout=3)
+        except:
+           print "Error"
+           exit()
+
+   if mute:
+       print "INFO: Mute toggle"
+       try:
+           response = s.post(denon, headers=headers, data='cmd0=PutVolumeMute%2FTOGGLE&cmd1=aspMainZone_WebUpdateStatus%2F', timeout=5)
+       except:
+           print "Error"
+           exit()
+
+
+###########################################################################################
+
+""" Start program """
+if __name__ == "__main__":
+    main()
