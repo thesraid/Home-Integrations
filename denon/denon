@@ -26,6 +26,13 @@ def get_args():
                         action='store',
                         help='Quick Select Option')
 
+    parser.add_argument('-t', '--tv',
+                        required=False,
+                        type=int,
+                        #default=443,
+                        action='store',
+                        help='Turn on TV')
+
     parser.add_argument('-u', '--volumeup',
                         type=int,
                         required=False,
@@ -57,6 +64,7 @@ def main():
    args = get_args()
 
    quick=args.quick
+   tv=args.tv
    up=args.volumeup
    down=args.volumedown
    mute=args.mute
@@ -78,7 +86,19 @@ def main():
       except:
          print "Error"
          exit()
-   
+  
+   """
+   Switch to TV
+   """
+   if tv:
+      print "INFO: Switching to TV"
+      try:
+         response = s.post(denon, headers=headers, data='cmd0=PutZone_InputFunction%2FBD&cmd1=aspMainZone_WebUpdateStatus%2F', timeout=7)
+      except:
+         print "Error"
+         exit()
+
+
    """ Increase the volume """
    if up:
       up = up * 2
