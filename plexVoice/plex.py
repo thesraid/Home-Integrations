@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 
-'''from plexapi.myplex import MyPlexAccount
-account = MyPlexAccount('thesraid', 'ry2HYp@PBpd4')
-plex = account.resource('thesraid').connect()  # returns a PlexServer instance
-'''
-
 from plexapi.server import PlexServer
 baseurl = 'http://192.168.0.14:32400'
 token = 'DXzLXpZV1uNRrcCPkAzZ'
